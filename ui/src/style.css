@@ -1,0 +1,259 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-secondary-50 text-secondary-900 font-sans antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  /* Button Components */
+  .btn {
+    @apply inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-600 hover:bg-primary-700 focus:ring-primary-500 text-white shadow-sm;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-white hover:bg-secondary-50 focus:ring-secondary-500 text-secondary-700 border border-secondary-300 shadow-sm;
+  }
+  
+  .btn-success {
+    @apply btn bg-success-600 hover:bg-success-700 focus:ring-success-500 text-white shadow-sm;
+  }
+  
+  .btn-warning {
+    @apply btn bg-warning-500 hover:bg-warning-600 focus:ring-warning-500 text-white shadow-sm;
+  }
+  
+  .btn-danger {
+    @apply btn bg-danger-600 hover:bg-danger-700 focus:ring-danger-500 text-white shadow-sm;
+  }
+  
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm rounded-md;
+  }
+  
+  .btn-md {
+    @apply px-4 py-2 text-sm rounded-lg;
+  }
+  
+  .btn-lg {
+    @apply px-6 py-3 text-base rounded-lg;
+  }
+  
+  /* Card Components */
+  .card {
+    @apply bg-white rounded-xl shadow-soft border border-secondary-200/60 transition-all duration-200;
+  }
+  
+  .card-hover {
+    @apply card hover:shadow-medium hover:border-secondary-300/60 cursor-pointer;
+  }
+  
+  .card-header {
+    @apply px-6 py-4 border-b border-secondary-200/60;
+  }
+  
+  .card-body {
+    @apply p-6;
+  }
+  
+  .card-footer {
+    @apply px-6 py-4 border-t border-secondary-200/60 bg-secondary-50/30;
+  }
+  
+  /* Status Components */
+  .status-indicator {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-success {
+    @apply status-indicator bg-success-100 text-success-800;
+  }
+  
+  .status-warning {
+    @apply status-indicator bg-warning-100 text-warning-800;
+  }
+  
+  .status-danger {
+    @apply status-indicator bg-danger-100 text-danger-800;
+  }
+  
+  .status-info {
+    @apply status-indicator bg-primary-100 text-primary-800;
+  }
+  
+  /* Navigation Components */
+  .nav-link {
+    @apply flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium transition-all duration-200;
+  }
+  
+  .nav-link-active {
+    @apply flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium transition-all duration-200 bg-primary-50 text-primary-700 shadow-sm;
+  }
+  
+  .nav-link-inactive {
+    @apply flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-medium transition-all duration-200 text-secondary-700 hover:text-primary-700 hover:bg-primary-50/50;
+  }
+  
+  /* Form Components */
+  .form-input {
+    @apply block w-full rounded-lg border border-secondary-300 bg-white px-3 py-2 text-sm placeholder-secondary-400 shadow-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-secondary-700 mb-2;
+  }
+  
+  /* Stats Components */
+  .stat-card {
+    @apply card-hover p-6;
+  }
+  
+  .stat-icon {
+    @apply flex-shrink-0 p-3 rounded-xl;
+  }
+  
+  .stat-icon-primary {
+    @apply stat-icon bg-primary-100 text-primary-600;
+  }
+  
+  .stat-icon-success {
+    @apply stat-icon bg-success-100 text-success-600;
+  }
+  
+  .stat-icon-warning {
+    @apply stat-icon bg-warning-100 text-warning-600;
+  }
+  
+  .stat-icon-info {
+    @apply stat-icon bg-secondary-100 text-secondary-600;
+  }
+  
+  /* Layout Components */
+  .page-header {
+    @apply mb-8;
+  }
+  
+  .page-title {
+    @apply text-3xl font-bold text-secondary-900 tracking-tight;
+  }
+  
+  .page-subtitle {
+    @apply mt-2 text-lg text-secondary-600;
+  }
+  
+  /* Animation utilities */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Text utilities */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Interactive elements */
+  .interactive {
+    transition: all 0.2s ease;
+  }
+  
+  .interactive:hover {
+    transform: scale(1.05);
+  }
+  
+  .interactive:active {
+    transform: scale(0.95);
+  }
+  
+  /* Loading animation */
+  .loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: .5;
+    }
+  }
+  
+  /* Responsive utilities */
+  .container-responsive {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+  
+  /* Dark mode support */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-primary: theme('colors.secondary.900');
+      --bg-secondary: theme('colors.secondary.800');
+      --text-primary: theme('colors.secondary.100');
+      --text-secondary: theme('colors.secondary.300');
+    }
+  }
+}

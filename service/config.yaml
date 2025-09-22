@@ -1,0 +1,35 @@
+# Configuration
+port: "8080"
+
+# Database
+db:
+  host: "localhost"
+  port: "5432"
+  name: "plate"
+  user: "plate"
+  password: "plate"
+  sslmode: "disable"
+
+# Kubernetes
+kubernetes:
+  config_path: "" # Leave empty to use in-cluster config or default kubeconfig
+  namespace: "plate-system"
+  in_cluster: false
+
+# ArgoCD
+argocd:
+  server: "https://argocd.example.com"
+  username: "admin"
+  password: "admin"
+  token: ""
+
+# Gitea
+gitea:
+  url: "https://git.example.com"
+  token: "your-gitea-token"
+  org_name: "plate"
+
+# Helm
+helm:
+  repo_url: "https://charts.example.com"
+  chart_path: "/tmp/plate-charts"
