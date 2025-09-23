@@ -1,6 +1,5 @@
 # Ignore mcp-servers and poc directories
 mcp-servers/
-poc/
 
 # =============================================================================
 # OPERATING SYSTEM FILES

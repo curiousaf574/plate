@@ -17,14 +17,17 @@ type ProjectResponse struct {
 }
 
 type DeploymentResponse struct {
-	ID          uint   `json:"id"`
-	Application string `json:"application"`
-	Environment string `json:"environment"`
-	Version     string `json:"version"`
-	Status      string `json:"status"`
-	URL         string `json:"url,omitempty"`
-	DeployedAt  string `json:"deployed_at"`
-	Duration    string `json:"duration,omitempty"`
+	ID                uint   `json:"id"`
+	Application       string `json:"application"`
+	Environment       string `json:"environment"`
+	Version           string `json:"version"`
+	Status            string `json:"status"`
+	URL               string `json:"url,omitempty"`
+	DeployedAt        string `json:"deployed_at"`
+	Duration          string `json:"duration,omitempty"`
+	DesiredReplicas   int32  `json:"desired_replicas"`
+	ReadyReplicas     int32  `json:"ready_replicas"`
+	AvailableReplicas int32  `json:"available_replicas"`
 }
 
 type EnvironmentResponse struct {

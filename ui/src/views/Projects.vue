@@ -8,6 +8,7 @@
           <p class="page-subtitle">Manage and deploy your applications across environments</p>
         </div>
         <div class="flex items-center space-x-3">
+          <!-- Search -->
           <div class="relative">
             <MagnifyingGlassIcon class="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-secondary-400" />
             <input 
@@ -17,27 +18,92 @@
               class="form-input pl-10 w-64"
             />
           </div>
+          
+          <!-- Sort Dropdown -->
           <Menu as="div" class="relative">
             <MenuButton class="btn btn-secondary btn-sm">
-              <FunnelIcon class="h-4 w-4 mr-2" />
-              Filter
+              <ArrowsUpDownIcon class="h-4 w-4 mr-2" />
+              Sort
               <ChevronDownIcon class="h-4 w-4 ml-1" />
             </MenuButton>
-            <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-xl bg-white py-2 shadow-large ring-1 ring-secondary-900/5 focus:outline-none">
-              <MenuItem v-for="filter in filters" :key="filter.key" v-slot="{ active }">
+            <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl bg-white py-2 shadow-large ring-1 ring-secondary-900/5 focus:outline-none">
+              <MenuItem v-for="sort in sortOptions" :key="sort.key" v-slot="{ active }">
                 <button 
-                  @click="selectedFilter = filter.key"
+                  @click="selectedSort = sort.key"
                   :class="[
                     active ? 'bg-secondary-50' : '', 
-                    selectedFilter === filter.key ? 'text-primary-700 font-medium' : 'text-secondary-700',
-                    'block w-full text-left px-4 py-2 text-sm'
+                    selectedSort === sort.key ? 'text-primary-700 font-medium' : 'text-secondary-700',
+                    'flex items-center w-full text-left px-4 py-2 text-sm'
                   ]"
                 >
-                  {{ filter.label }}
+                  <component :is="sort.icon" class="h-4 w-4 mr-3" />
+                  {{ sort.label }}
                 </button>
               </MenuItem>
             </MenuItems>
           </Menu>
+          
+          <!-- Filter Dropdown -->
+          <Menu as="div" class="relative">
+            <MenuButton class="btn btn-secondary btn-sm">
+              <FunnelIcon class="h-4 w-4 mr-2" />
+              {{ getFilterLabel() }}
+              <ChevronDownIcon class="h-4 w-4 ml-1" />
+            </MenuButton>
+            <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-xl bg-white py-2 shadow-large ring-1 ring-secondary-900/5 focus:outline-none">
+              <div class="px-4 py-2 text-xs font-medium text-secondary-500 uppercase tracking-wide">Status</div>
+              <MenuItem v-for="filter in statusFilters" :key="filter.key" v-slot="{ active }">
+                <button 
+                  @click="selectedStatusFilter = filter.key"
+                  :class="[
+                    active ? 'bg-secondary-50' : '', 
+                    selectedStatusFilter === filter.key ? 'text-primary-700 font-medium' : 'text-secondary-700',
+                    'flex items-center w-full text-left px-4 py-2 text-sm'
+                  ]"
+                >
+                  <div :class="['w-2 h-2 rounded-full mr-3', filter.color]"></div>
+                  {{ filter.label }}
+                </button>
+              </MenuItem>
+              <div class="border-t border-secondary-100 my-1"></div>
+              <div class="px-4 py-2 text-xs font-medium text-secondary-500 uppercase tracking-wide">Runtime</div>
+              <MenuItem v-for="runtime in runtimeFilters" :key="runtime" v-slot="{ active }">
+                <button 
+                  @click="selectedRuntimeFilter = runtime"
+                  :class="[
+                    active ? 'bg-secondary-50' : '', 
+                    selectedRuntimeFilter === runtime ? 'text-primary-700 font-medium' : 'text-secondary-700',
+                    'block w-full text-left px-4 py-2 text-sm'
+                  ]"
+                >
+                  {{ runtime || 'All Runtimes' }}
+                </button>
+              </MenuItem>
+            </MenuItems>
+          </Menu>
+          
+          <!-- View Toggle -->
+          <div class="flex rounded-lg border border-secondary-200 bg-secondary-50 p-1">
+            <button 
+              @click="viewMode = 'tile'"
+              :class="[
+                'p-1.5 rounded-md transition-all duration-200',
+                viewMode === 'tile' ? 'bg-white shadow-sm text-primary-600' : 'text-secondary-400 hover:text-secondary-600'
+              ]"
+            >
+              <Squares2X2Icon class="h-4 w-4" />
+            </button>
+            <button 
+              @click="viewMode = 'list'"
+              :class="[
+                'p-1.5 rounded-md transition-all duration-200',
+                viewMode === 'list' ? 'bg-white shadow-sm text-primary-600' : 'text-secondary-400 hover:text-secondary-600'
+              ]"
+            >
+              <Bars3Icon class="h-4 w-4" />
+            </button>
+          </div>
+          
           <button class="btn btn-primary btn-sm">
             <PlusIcon class="h-4 w-4 mr-2" />
             Import Application
@@ -52,7 +118,7 @@
         <div class="flex items-center justify-between">
           <div>
             <p class="text-sm font-medium text-secondary-600">Total Apps</p>
-            <p class="text-2xl font-bold text-secondary-900">{{ filteredProjects.length }}</p>
+            <p class="text-2xl font-bold text-secondary-900">{{ filteredAndSortedProjects.length }}</p>
           </div>
           <div class="stat-icon-primary">
             <FolderIcon class="h-5 w-5" />
@@ -113,14 +179,17 @@
       </button>
     </div>
 
-    <!-- Applications Grid -->
-    <div v-else-if="filteredProjects.length > 0" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      <div 
-        v-for="(project, index) in filteredProjects" 
-        :key="project.id" 
-        class="card-hover slide-up"
-        :style="{ animationDelay: `${index * 50}ms` }"
-      >
+    <!-- Applications View -->
+    <div v-else-if="filteredAndSortedProjects.length > 0">
+      <!-- Tile View -->
+      <div v-if="viewMode === 'tile'" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div 
+          v-for="(project, index) in filteredAndSortedProjects" 
+          :key="project.id" 
+          class="card-hover slide-up cursor-pointer"
+          :style="{ animationDelay: `${index * 50}ms` }"
+          @click="$router.push(`/projects/${project.name}`)"
+        >
         <div class="card-body">
           <!-- Project Header -->
           <div class="flex items-start justify-between mb-4">
@@ -137,12 +206,18 @@
               </div>
             </div>
             <Menu as="div" class="relative">
-              <MenuButton class="p-1 hover:bg-secondary-100 rounded-lg transition-colors">
+              <MenuButton 
+                class="p-1 hover:bg-secondary-100 rounded-lg transition-colors"
+                @click.stop
+              >
                 <EllipsisVerticalIcon class="h-4 w-4 text-secondary-400" />
               </MenuButton>
               <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-xl bg-white py-2 shadow-large ring-1 ring-secondary-900/5 focus:outline-none">
                 <MenuItem v-slot="{ active }">
-                  <button :class="[active ? 'bg-secondary-50' : '', 'block w-full text-left px-4 py-2 text-sm text-secondary-700']">
+                  <button 
+                    :class="[active ? 'bg-secondary-50' : '', 'block w-full text-left px-4 py-2 text-sm text-secondary-700']"
+                    @click="$router.push(`/projects/${project.name}`)"
+                  >
                     View Details
                   </button>
                 </MenuItem>
@@ -207,16 +282,258 @@
           
           <!-- Action Buttons -->
           <div class="flex space-x-2">
-            <button class="btn btn-primary btn-sm flex-1">
+            <button 
+              class="btn btn-primary btn-sm flex-1"
+              @click.stop
+            >
               <RocketLaunchIcon class="h-4 w-4 mr-2" />
               Deploy
             </button>
-            <button class="btn btn-secondary btn-sm">
+            <button 
+              class="btn btn-secondary btn-sm"
+              @click.stop="$router.push(`/projects/${project.name}`)"
+            >
               <CogIcon class="h-4 w-4" />
             </button>
-            <button class="btn btn-secondary btn-sm">
+            <button 
+              class="btn btn-secondary btn-sm"
+              @click.stop="$router.push(`/projects/${project.name}`)"
+            >
               <ChartBarIcon class="h-4 w-4" />
             </button>
+          </div>
+        </div>
+        </div>
+      </div>
+      
+      <!-- List View -->
+      <div v-else class="bg-white rounded-xl border border-secondary-200 overflow-hidden">
+        <!-- Table Header -->
+        <div class="px-6 py-4 border-b border-secondary-200 bg-secondary-50">
+          <div class="grid grid-cols-12 gap-4 items-center">
+            <div class="col-span-4">
+              <span class="text-sm font-medium text-secondary-700">Application</span>
+            </div>
+            <div class="col-span-1 text-center">
+              <span class="text-sm font-medium text-secondary-700">Status</span>
+            </div>
+            <div class="col-span-2 text-center">
+              <span class="text-sm font-medium text-secondary-700">Environments</span>
+            </div>
+            <div class="col-span-1 text-center">
+              <span class="text-sm font-medium text-secondary-700">Routes</span>
+            </div>
+            <div class="col-span-2 text-center">
+              <span class="text-sm font-medium text-secondary-700">Last Deploy</span>
+            </div>
+            <div class="col-span-2 text-center">
+              <span class="text-sm font-medium text-secondary-700">Actions</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Body -->
+        <div class="divide-y divide-secondary-100">
+          <div 
+            v-for="(project, index) in filteredAndSortedProjects" 
+            :key="project.id" 
+            class="px-6 py-5 hover:bg-secondary-50 cursor-pointer transition-all duration-200 slide-up group"
+            :style="{ animationDelay: `${index * 25}ms` }"
+            @click="$router.push(`/projects/${project.name}`)"
+          >
+            <div class="grid grid-cols-12 gap-4 items-center">
+              <!-- Application Info -->
+              <div class="col-span-4">
+                <div class="flex items-center space-x-4">
+                  <div :class="[
+                    'h-11 w-11 rounded-xl flex items-center justify-center text-sm font-semibold shadow-sm transition-transform group-hover:scale-105',
+                    getProjectTypeColor(project.runtime)
+                  ]">
+                    {{ getProjectIcon(project.runtime) }}
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center space-x-2">
+                      <h4 class="font-semibold text-secondary-900 truncate">{{ project.name }}</h4>
+                      <span class="text-xs font-mono text-secondary-500 bg-secondary-100 px-2 py-1 rounded-md">
+                        {{ project.version }}
+                      </span>
+                    </div>
+                    <p class="text-sm text-secondary-600 truncate">{{ project.description }}</p>
+                    <div class="flex items-center space-x-2 mt-1">
+                      <span class="text-xs text-secondary-500">{{ project.runtime }}</span>
+                      <span class="text-xs text-secondary-400">•</span>
+                      <span class="text-xs text-secondary-500">Updated {{ project.lastDeploy }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Status -->
+              <div class="col-span-1 text-center">
+                <div class="flex flex-col items-center space-y-1">
+                  <span :class="[
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium',
+                    project.status === 'active' ? 'bg-success-100 text-success-800' :
+                    project.status === 'deploying' ? 'bg-warning-100 text-warning-800' :
+                    project.status === 'failed' ? 'bg-danger-100 text-danger-800' :
+                    'bg-secondary-100 text-secondary-800'
+                  ]">
+                    <div :class="[
+                      'w-1.5 h-1.5 rounded-full mr-1.5',
+                      project.status === 'active' ? 'bg-success-400' :
+                      project.status === 'deploying' ? 'bg-warning-400 animate-pulse' :
+                      project.status === 'failed' ? 'bg-danger-400' :
+                      'bg-secondary-400'
+                    ]"></div>
+                    {{ project.status }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Environments -->
+              <div class="col-span-2 text-center">
+                <div class="flex flex-wrap justify-center gap-1">
+                  <span 
+                    v-for="env in project.environments.slice(0, 3)" 
+                    :key="env" 
+                    :class="[
+                      'inline-flex items-center px-2 py-1 rounded-md text-xs font-medium',
+                      env === 'production' ? 'bg-danger-100 text-danger-700' :
+                      env === 'staging' ? 'bg-warning-100 text-warning-700' :
+                      'bg-primary-100 text-primary-700'
+                    ]"
+                  >
+                    {{ env }}
+                  </span>
+                  <span 
+                    v-if="project.environments.length > 3" 
+                    class="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-secondary-100 text-secondary-700"
+                  >
+                    +{{ project.environments.length - 3 }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Routes -->
+              <div class="col-span-1 text-center">
+                <div class="flex flex-col items-center space-y-1">
+                  <div v-if="project.routes && project.routes.length > 0" class="flex items-center justify-center space-x-1">
+                    <GlobeAltIcon class="h-4 w-4 text-success-500" />
+                    <span class="text-sm font-semibold text-success-700">{{ project.routes.length }}</span>
+                  </div>
+                  <div v-else class="flex items-center justify-center space-x-1">
+                    <GlobeAltIcon class="h-4 w-4 text-secondary-300" />
+                    <span class="text-sm text-secondary-400">0</span>
+                  </div>
+                  <span class="text-xs text-secondary-500">
+                    {{ project.routes && project.routes.length ? 'active' : 'none' }}
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Last Deploy -->
+              <div class="col-span-2 text-center">
+                <div class="flex flex-col items-center space-y-1">
+                  <div class="flex items-center space-x-2">
+                    <ClockIcon class="h-4 w-4 text-secondary-400" />
+                    <span class="text-sm font-medium text-secondary-900">{{ project.lastDeploy }}</span>
+                  </div>
+                  <div class="flex items-center space-x-1 text-xs text-secondary-500">
+                    <span>via</span>
+                    <span class="font-mono bg-secondary-100 px-1.5 py-0.5 rounded">{{ project.runtime }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Actions -->
+              <div class="col-span-2 text-center">
+                <div class="flex items-center justify-center space-x-2">
+                  <button 
+                    class="btn btn-primary btn-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    @click.stop
+                    title="Deploy Application"
+                  >
+                    <RocketLaunchIcon class="h-4 w-4 mr-1" />
+                    Deploy
+                  </button>
+                  
+                  <button 
+                    class="btn btn-secondary btn-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    @click.stop="$router.push(`/projects/${project.name}`)"
+                    title="View Details"
+                  >
+                    <ChartBarIcon class="h-4 w-4" />
+                  </button>
+                  
+                  <Menu as="div" class="relative">
+                    <MenuButton 
+                      class="btn btn-secondary btn-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      @click.stop
+                      title="More Actions"
+                    >
+                      <EllipsisVerticalIcon class="h-4 w-4" />
+                    </MenuButton>
+                    <MenuItems class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-xl bg-white py-2 shadow-large ring-1 ring-secondary-900/5 focus:outline-none">
+                      <MenuItem v-slot="{ active }">
+                        <button 
+                          :class="[active ? 'bg-secondary-50' : '', 'flex items-center w-full text-left px-4 py-2 text-sm text-secondary-700']"
+                          @click="$router.push(`/projects/${project.name}`)"
+                        >
+                          <ChartBarIcon class="h-4 w-4 mr-3 text-secondary-400" />
+                          View Details
+                        </button>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }">
+                        <button :class="[active ? 'bg-secondary-50' : '', 'flex items-center w-full text-left px-4 py-2 text-sm text-secondary-700']">
+                          <CogIcon class="h-4 w-4 mr-3 text-secondary-400" />
+                          Configure
+                        </button>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }">
+                        <button :class="[active ? 'bg-secondary-50' : '', 'flex items-center w-full text-left px-4 py-2 text-sm text-secondary-700']">
+                          <ArrowPathIcon class="h-4 w-4 mr-3 text-secondary-400" />
+                          Redeploy
+                        </button>
+                      </MenuItem>
+                      <MenuItem v-slot="{ active }">
+                        <button :class="[active ? 'bg-secondary-50' : '', 'flex items-center w-full text-left px-4 py-2 text-sm text-secondary-700']">
+                          <GlobeAltIcon class="h-4 w-4 mr-3 text-secondary-400" />
+                          View Routes
+                        </button>
+                      </MenuItem>
+                      <div class="border-t border-secondary-100 my-1"></div>
+                      <MenuItem v-slot="{ active }">
+                        <button :class="[active ? 'bg-danger-50' : '', 'flex items-center w-full text-left px-4 py-2 text-sm text-danger-700']">
+                          <ExclamationTriangleIcon class="h-4 w-4 mr-3 text-danger-400" />
+                          Delete Application
+                        </button>
+                      </MenuItem>
+                    </MenuItems>
+                  </Menu>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer with summary -->
+        <div class="px-6 py-4 border-t border-secondary-200 bg-secondary-50">
+          <div class="flex items-center justify-between text-sm text-secondary-600">
+            <span>Showing {{ filteredAndSortedProjects.length }} application{{ filteredAndSortedProjects.length !== 1 ? 's' : '' }}</span>
+            <div class="flex items-center space-x-4">
+              <span class="flex items-center space-x-1">
+                <div class="w-2 h-2 rounded-full bg-success-400"></div>
+                <span>{{ activeApps }} Active</span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <div class="w-2 h-2 rounded-full bg-warning-400"></div>
+                <span>{{ deployingApps }} Deploying</span>
+              </span>
+              <span class="flex items-center space-x-1">
+                <div class="w-2 h-2 rounded-full bg-danger-400"></div>
+                <span>{{ failedApps }} Issues</span>
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -259,21 +576,39 @@ import {
   RocketLaunchIcon,
   CogIcon,
   ChartBarIcon,
-  EllipsisVerticalIcon
+  EllipsisVerticalIcon,
+  ArrowsUpDownIcon,
+  Squares2X2Icon,
+  Bars3Icon,
+  GlobeAltIcon,
+  ClockIcon,
+  TagIcon,
+  FireIcon
 } from '@heroicons/vue/24/outline'
 
 const projects = ref([])
 const loading = ref(true)
 const error = ref(null)
 const searchQuery = ref('')
-const selectedFilter = ref('all')
+const selectedStatusFilter = ref('all')
+const selectedRuntimeFilter = ref('')
+const selectedSort = ref('name')
+const viewMode = ref('tile')
 
-const filters = [
-  { key: 'all', label: 'All Applications' },
-  { key: 'active', label: 'Active' },
-  { key: 'deploying', label: 'Deploying' },
-  { key: 'failed', label: 'Issues' },
-  { key: 'inactive', label: 'Inactive' },
+const statusFilters = [
+  { key: 'all', label: 'All Status', color: 'bg-secondary-400' },
+  { key: 'active', label: 'Active', color: 'bg-success-400' },
+  { key: 'deploying', label: 'Deploying', color: 'bg-warning-400' },
+  { key: 'failed', label: 'Issues', color: 'bg-danger-400' },
+  { key: 'inactive', label: 'Inactive', color: 'bg-secondary-400' },
+]
+
+const sortOptions = [
+  { key: 'name', label: 'Name (A-Z)', icon: TagIcon },
+  { key: 'name-desc', label: 'Name (Z-A)', icon: TagIcon },
+  { key: 'status', label: 'Status', icon: CheckCircleIcon },
+  { key: 'lastDeploy', label: 'Last Deploy', icon: ClockIcon },
+  { key: 'runtime', label: 'Runtime', icon: CogIcon },
 ]
 
 // Mock data for demo - replace with API call
@@ -340,7 +675,12 @@ const mockProjects = [
   }
 ]
 
-const filteredProjects = computed(() => {
+const runtimeFilters = computed(() => {
+  const runtimes = [...new Set(projects.value.map(p => p.runtime))].sort()
+  return ['', ...runtimes]
+})
+
+const filteredAndSortedProjects = computed(() => {
   let filtered = projects.value
 
   // Filter by search query
@@ -354,12 +694,45 @@ const filteredProjects = computed(() => {
   }
 
   // Filter by status
-  if (selectedFilter.value !== 'all') {
-    filtered = filtered.filter(project => project.status === selectedFilter.value)
+  if (selectedStatusFilter.value !== 'all') {
+    filtered = filtered.filter(project => project.status === selectedStatusFilter.value)
   }
+
+  // Filter by runtime
+  if (selectedRuntimeFilter.value) {
+    filtered = filtered.filter(project => project.runtime === selectedRuntimeFilter.value)
+  }
+
+  // Sort
+  filtered.sort((a, b) => {
+    switch (selectedSort.value) {
+      case 'name':
+        return a.name.localeCompare(b.name)
+      case 'name-desc':
+        return b.name.localeCompare(a.name)
+      case 'status':
+        return a.status.localeCompare(b.status)
+      case 'lastDeploy':
+        // Simple string comparison for demo - you'd parse dates in real app
+        return b.lastDeploy.localeCompare(a.lastDeploy)
+      case 'runtime':
+        return a.runtime.localeCompare(b.runtime)
+      default:
+        return 0
+    }
+  })
 
   return filtered
 })
+
+const getFilterLabel = () => {
+  const statusLabel = statusFilters.find(f => f.key === selectedStatusFilter.value)?.label || 'All'
+  const runtimeLabel = selectedRuntimeFilter.value || 'All Runtimes'
+  if (selectedStatusFilter.value === 'all' && !selectedRuntimeFilter.value) {
+    return 'Filter'
+  }
+  return `${statusLabel}${selectedRuntimeFilter.value ? ` • ${runtimeLabel}` : ''}`
+}
 
 const activeApps = computed(() => projects.value.filter(p => p.status === 'active').length)
 const deployingApps = computed(() => projects.value.filter(p => p.status === 'deploying').length)
@@ -377,23 +750,45 @@ const fetchProjects = async () => {
     }
     const data = await response.json()
     
-    // Transform API data to match UI expectations
-    projects.value = data.map(project => ({
-      id: project.id,
-      name: project.name,
-      description: project.description,
-      runtime: project.runtime,
-      status: project.status,
-      lastDeploy: project.last_deploy,
-      version: 'v1.0.0', // Default version since API doesn't provide it
-      environments: project.environments
+    // Transform API data and fetch route information for each project
+    const projectsWithRoutes = await Promise.all(data.map(async (project) => {
+      let routes = []
+      
+      // Fetch route information for each environment
+      try {
+        // Try to get deployment status which now includes routes
+        const statusResponse = await fetch(`http://localhost:8080/api/v1/manage/dev/${project.name}/status`)
+        if (statusResponse.ok) {
+          const statusData = await statusResponse.json()
+          routes = statusData.routes || []
+        }
+      } catch (err) {
+        console.warn(`Failed to fetch routes for ${project.name}:`, err)
+      }
+      
+      return {
+        id: project.id,
+        name: project.name,
+        description: project.description,
+        runtime: project.runtime,
+        status: project.status,
+        lastDeploy: project.last_deploy,
+        version: 'v1.0.0', // Default version since API doesn't provide it
+        environments: project.environments,
+        routes: routes
+      }
     }))
+    
+    projects.value = projectsWithRoutes
   } catch (err) {
     error.value = err.message
     console.error('Failed to fetch projects:', err)
     
     // Fallback to mock data if API fails
-    projects.value = mockProjects
+    projects.value = mockProjects.map(project => ({
+      ...project,
+      routes: [] // Add empty routes to mock data
+    }))
   } finally {
     loading.value = false
   }
@@ -401,7 +796,8 @@ const fetchProjects = async () => {
 
 const clearSearch = () => {
   searchQuery.value = ''
-  selectedFilter.value = 'all'
+  selectedStatusFilter.value = 'all'
+  selectedRuntimeFilter.value = ''
 }
 
 const getProjectIcon = (runtime) => {

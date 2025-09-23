@@ -3,6 +3,7 @@ import Dashboard from '../views/Dashboard.vue'
 import Projects from '../views/Projects.vue'
 import Deployments from '../views/Deployments.vue'
 import Settings from '../views/Settings.vue'
+import AppDetail from '../views/AppDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -16,6 +17,12 @@ const router = createRouter({
       path: '/projects',
       name: 'projects',
       component: Projects
+    },
+    {
+      path: '/projects/:name',
+      name: 'app-detail',
+      component: AppDetail,
+      props: true
     },
     {
       path: '/deployments',

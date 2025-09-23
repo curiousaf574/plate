@@ -6,33 +6,41 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/plate/service/internal/models"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (s *Server) handleListEnvironments(c *gin.Context) {
-	// Return developer-friendly fake data
-	environments := []EnvironmentResponse{
-		{
-			ID:     1,
-			Name:   "development",
-			Type:   "development",
-			Region: "us-west-2",
-			Status: "active",
-		},
-		{
-			ID:     2,
-			Name:   "staging",
-			Type:   "staging",
-			Region: "us-west-2",
-			Status: "active",
-		},
-		{
-			ID:     3,
-			Name:   "production",
-			Type:   "production",
-			Region: "us-west-2",
-			Status: "active",
-		},
+	// Get namespaces managed by Plate
+	namespaces, err := s.services.Kubernetes.GetClientset().CoreV1().Namespaces().List(c, metav1.ListOptions{
+		LabelSelector: "managed-by=plate",
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get namespaces"})
+		return
 	}
+
+	var environments []EnvironmentResponse
+	for i, ns := range namespaces.Items {
+		envType := ns.Labels["environment"]
+		if envType == "" {
+			envType = ns.Name
+		}
+
+		// Determine status based on namespace phase
+		status := "active"
+		if ns.Status.Phase != "Active" {
+			status = "inactive"
+		}
+
+		environments = append(environments, EnvironmentResponse{
+			ID:     uint(i + 1),
+			Name:   ns.Name,
+			Type:   envType,
+			Region: "local",
+			Status: status,
+		})
+	}
+
 	c.JSON(http.StatusOK, environments)
 }
 

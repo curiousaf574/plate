@@ -1,79 +1,77 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/plate/service/internal/models"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func (s *Server) handleListDeployments(c *gin.Context) {
-	// Return developer-friendly fake data
-	deployments := []DeploymentResponse{
-		{
-			ID:          1,
-			Application: "web-app",
-			Environment: "production",
-			Version:     "v1.2.3",
-			Status:      "live",
-			URL:         "https://web-app.yourapp.com",
-			DeployedAt:  "2 hours ago",
-			Duration:    "45s",
-		},
-		{
-			ID:          2,
-			Application: "web-app",
-			Environment: "staging",
-			Version:     "v1.2.4-beta",
-			Status:      "live",
-			URL:         "https://web-app-staging.yourapp.com",
-			DeployedAt:  "4 hours ago",
-			Duration:    "52s",
-		},
-		{
-			ID:          3,
-			Application: "api-service",
-			Environment: "production",
-			Version:     "v2.1.0",
-			Status:      "live",
-			URL:         "https://api.yourapp.com",
-			DeployedAt:  "1 day ago",
-			Duration:    "1m 23s",
-		},
-		{
-			ID:          4,
-			Application: "api-service",
-			Environment: "development",
-			Version:     "v2.1.1-dev",
-			Status:      "failed",
-			URL:         "",
-			DeployedAt:  "2 hours ago",
-			Duration:    "failed at 30s",
-		},
-		{
-			ID:          5,
-			Application: "worker-service",
-			Environment: "production",
-			Version:     "v1.0.5",
-			Status:      "live",
-			URL:         "",
-			DeployedAt:  "3 days ago",
-			Duration:    "1m 10s",
-		},
-		{
-			ID:          6,
-			Application: "data-processor",
-			Environment: "development",
-			Version:     "v0.1.0-dev",
-			Status:      "building",
-			URL:         "",
-			DeployedAt:  "building...",
-			Duration:    "2m 15s",
-		},
+	// Get deployments from all Plate-managed namespaces
+	namespaces := []string{"dev", "staging", "production"}
+	var allDeployments []DeploymentResponse
+
+	for _, namespace := range namespaces {
+		deployments, err := s.services.Kubernetes.GetClientset().AppsV1().Deployments(namespace).List(c, metav1.ListOptions{
+			LabelSelector: "managed-by=plate",
+		})
+		if err != nil {
+			continue
+		}
+
+		for i, deployment := range deployments.Items {
+			appName := deployment.Labels["app"]
+			if appName == "" {
+				appName = deployment.Name
+			}
+
+			version := deployment.Labels["version"]
+			if version == "" {
+				version = "latest"
+			}
+
+			status := "live"
+			if deployment.Status.ReadyReplicas == 0 {
+				status = "failed"
+			} else if deployment.Status.ReadyReplicas < *deployment.Spec.Replicas {
+				status = "building"
+			}
+
+			deployedAt := "unknown"
+			if deployment.CreationTimestamp.Time.IsZero() == false {
+				deployedAt = deployment.CreationTimestamp.Format("2006-01-02 15:04")
+			}
+
+			// Generate URL for web services
+			url := ""
+			if strings.Contains(appName, "web") || strings.Contains(appName, "frontend") {
+				url = fmt.Sprintf("https://%s.%s.yourapp.com", appName, namespace)
+			} else if strings.Contains(appName, "api") {
+				url = fmt.Sprintf("https://api.%s.yourapp.com", namespace)
+			}
+
+			allDeployments = append(allDeployments, DeploymentResponse{
+				ID:                uint(len(allDeployments) + i + 1),
+				Application:       appName,
+				Environment:       namespace,
+				Version:           version,
+				Status:            status,
+				URL:               url,
+				DeployedAt:        deployedAt,
+				Duration:          "N/A",
+				DesiredReplicas:   *deployment.Spec.Replicas,
+				ReadyReplicas:     deployment.Status.ReadyReplicas,
+				AvailableReplicas: deployment.Status.AvailableReplicas,
+			})
+		}
 	}
-	c.JSON(http.StatusOK, deployments)
+
+	c.JSON(http.StatusOK, allDeployments)
 }
 
 func (s *Server) handleCreateDeployment(c *gin.Context) {
@@ -164,117 +162,127 @@ func (s *Server) handleGetStatus(c *gin.Context) {
 	detailed := c.Query("detailed") == "true"
 
 	if detailed {
-		// Return detailed status for all or specific environment
-		statuses := []DetailedStatusResponse{
-			{
-				Environment: "production",
-				Region:      "us-west-2",
-				Status:      "healthy",
-				Applications: []ApplicationStatusResponse{
-					{
-						Application: "web-app",
-						Environment: "production",
-						Status:      "live",
-						Health:      "healthy",
-						URL:         "https://web-app.yourapp.com",
-						Version:     "v1.2.3",
-						Uptime:      "99.9%",
-						LastUpdate:  "2 hours ago",
-					},
-					{
-						Application: "api-service",
-						Environment: "production",
-						Status:      "live",
-						Health:      "healthy",
-						URL:         "https://api.yourapp.com",
-						Version:     "v2.1.0",
-						Uptime:      "99.8%",
-						LastUpdate:  "1 day ago",
-					},
-				},
-				LastUpdate: "2025-09-19T10:30:00Z",
-			},
-			{
-				Environment: "staging",
-				Region:      "us-west-2",
-				Status:      "healthy",
-				Applications: []ApplicationStatusResponse{
-					{
-						Application: "web-app",
-						Environment: "staging",
-						Status:      "live",
-						Health:      "healthy",
-						URL:         "https://web-app-staging.yourapp.com",
-						Version:     "v1.2.4-beta",
-						Uptime:      "99.5%",
-						LastUpdate:  "4 hours ago",
-					},
-				},
-				LastUpdate: "2025-09-19T09:15:00Z",
-			},
-			{
-				Environment: "development",
-				Region:      "us-west-2",
-				Status:      "degraded",
-				Applications: []ApplicationStatusResponse{
-					{
-						Application: "api-service",
-						Environment: "development",
-						Status:      "failed",
-						Health:      "unhealthy",
-						URL:         "",
-						Version:     "v2.1.1-dev",
-						Uptime:      "0%",
-						LastUpdate:  "2 hours ago",
-					},
-					{
-						Application: "data-processor",
-						Environment: "development",
-						Status:      "building",
-						Health:      "unknown",
-						URL:         "",
-						Version:     "v0.1.0-dev",
-						Uptime:      "N/A",
-						LastUpdate:  "building...",
-					},
-				},
-				LastUpdate: "2025-09-19T08:45:00Z",
-			},
+		// Return detailed status from Kubernetes
+		namespaces := []string{"dev", "staging", "production"}
+		if env != "" {
+			namespaces = []string{env}
 		}
 
-		if env != "" {
-			for _, status := range statuses {
-				if status.Environment == env {
-					c.JSON(http.StatusOK, []DetailedStatusResponse{status})
-					return
-				}
+		var statuses []DetailedStatusResponse
+		for _, namespace := range namespaces {
+			deployments, err := s.services.Kubernetes.GetClientset().AppsV1().Deployments(namespace).List(c, metav1.ListOptions{
+				LabelSelector: "managed-by=plate",
+			})
+			if err != nil {
+				continue
 			}
-			c.JSON(http.StatusOK, []DetailedStatusResponse{})
-			return
+
+			var applications []ApplicationStatusResponse
+			overallStatus := "healthy"
+
+			for _, deployment := range deployments.Items {
+				appName := deployment.Labels["app"]
+				if appName == "" {
+					appName = deployment.Name
+				}
+				version := deployment.Labels["version"]
+				if version == "" {
+					version = "latest"
+				}
+
+				status := "live"
+				health := "healthy"
+				uptime := "99.9%"
+				
+				if deployment.Status.ReadyReplicas == 0 {
+					status = "failed"
+					health = "unhealthy"
+					uptime = "0%"
+					overallStatus = "degraded"
+				} else if deployment.Status.ReadyReplicas < *deployment.Spec.Replicas {
+					status = "building"
+					health = "unknown"
+					uptime = "N/A"
+					if overallStatus == "healthy" {
+						overallStatus = "degraded"
+					}
+				}
+
+				url := ""
+				if strings.Contains(appName, "web") || strings.Contains(appName, "frontend") {
+					url = fmt.Sprintf("https://%s.%s.yourapp.com", appName, namespace)
+				} else if strings.Contains(appName, "api") {
+					url = fmt.Sprintf("https://api.%s.yourapp.com", namespace)
+				}
+
+				lastUpdate := "unknown"
+				if !deployment.CreationTimestamp.Time.IsZero() {
+					lastUpdate = deployment.CreationTimestamp.Format("2006-01-02 15:04")
+				}
+
+				applications = append(applications, ApplicationStatusResponse{
+					Application: appName,
+					Environment: namespace,
+					Status:      status,
+					Health:      health,
+					URL:         url,
+					Version:     version,
+					Uptime:      uptime,
+					LastUpdate:  lastUpdate,
+				})
+			}
+
+			if len(applications) > 0 {
+				statuses = append(statuses, DetailedStatusResponse{
+					Environment:  namespace,
+					Region:       "local",
+					Status:       overallStatus,
+					Applications: applications,
+					LastUpdate:   "2025-09-22T10:30:00Z",
+				})
+			}
 		}
 
 		c.JSON(http.StatusOK, statuses)
 		return
 	}
 
-	// Return simple status
-	status := gin.H{
-		"web-app-production":         "live",
-		"web-app-staging":           "live", 
-		"api-service-production":    "live",
-		"api-service-development":   "failed",
-		"worker-service-production": "live",
-		"data-processor-development": "building",
+	// Return simple status from Kubernetes
+	namespaces := []string{"dev", "staging", "production"}
+	status := gin.H{}
+
+	for _, namespace := range namespaces {
+		deployments, err := s.services.Kubernetes.GetClientset().AppsV1().Deployments(namespace).List(c, metav1.ListOptions{
+			LabelSelector: "managed-by=plate",
+		})
+		if err != nil {
+			continue
+		}
+
+		for _, deployment := range deployments.Items {
+			appName := deployment.Labels["app"]
+			if appName == "" {
+				appName = deployment.Name
+			}
+
+			key := fmt.Sprintf("%s-%s", appName, namespace)
+			deploymentStatus := "live"
+			
+			if deployment.Status.ReadyReplicas == 0 {
+				deploymentStatus = "failed"
+			} else if deployment.Status.ReadyReplicas < *deployment.Spec.Replicas {
+				deploymentStatus = "building"
+			}
+
+			status[key] = deploymentStatus
+		}
 	}
 
+	// Filter by environment if specified
 	if env != "" {
 		filtered := gin.H{}
 		for key, value := range status {
-			if env == "production" && strings.Contains(key, "production") {
-				filtered[key] = value
-			} else if env == "staging" && strings.Contains(key, "staging") {
-				filtered[key] = value
-			} else if env == "development" && strings.Contains(key, "development") {
+			if strings.Contains(key, "-"+env) {
 				filtered[key] = value
 			}
 		}

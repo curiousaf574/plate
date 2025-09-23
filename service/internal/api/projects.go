@@ -1,58 +1,96 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/plate/service/internal/models"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Project handlers
 func (s *Server) handleListProjects(c *gin.Context) {
-	// Return developer-friendly fake data
-	projects := []ProjectResponse{
-		{
-			ID:          1,
-			Name:        "web-app",
-			Description: "Frontend React application for the main website",
-			Repository:  "https://github.com/yourorg/web-app.git",
-			Runtime:     "nodejs",
-			Status:      "active",
-			LastDeploy:  "2 hours ago",
-			Environments: []string{"development", "staging", "production"},
-		},
-		{
-			ID:          2,
-			Name:        "api-service",
-			Description: "REST API backend service written in Go",
-			Repository:  "https://github.com/yourorg/api-service.git",
-			Runtime:     "go",
-			Status:      "active",
-			LastDeploy:  "1 day ago",
-			Environments: []string{"development", "staging", "production"},
-		},
-		{
-			ID:          3,
-			Name:        "data-processor",
-			Description: "Python service for data processing and analytics",
-			Repository:  "https://github.com/yourorg/data-processor.git",
-			Runtime:     "python",
-			Status:      "building",
-			LastDeploy:  "never",
-			Environments: []string{"development"},
-		},
-		{
-			ID:          4,
-			Name:        "worker-service",
-			Description: "Background job processing service",
-			Repository:  "https://github.com/yourorg/worker-service.git",
-			Runtime:     "go",
-			Status:      "inactive",
-			LastDeploy:  "1 week ago",
-			Environments: []string{"production"},
-		},
+	// Get all namespaces managed by Plate
+	namespaces, err := s.services.Kubernetes.GetNamespaces()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get namespaces"})
+		return
 	}
+
+	// Filter namespaces managed by Plate
+	plateNamespaces := []string{}
+	for _, ns := range namespaces {
+		if ns == "dev" || ns == "staging" || ns == "production" {
+			plateNamespaces = append(plateNamespaces, ns)
+		}
+	}
+
+	// Collect unique applications across all environments
+	applicationMap := make(map[string]*ProjectResponse)
+
+	for _, namespace := range plateNamespaces {
+		deployments, err := s.services.Kubernetes.GetClientset().AppsV1().Deployments(namespace).List(c, metav1.ListOptions{
+			LabelSelector: "managed-by=plate",
+		})
+		if err != nil {
+			continue
+		}
+
+		for i, deployment := range deployments.Items {
+			appName := deployment.Labels["app"]
+			runtime := deployment.Labels["runtime"]
+			if appName == "" {
+				appName = deployment.Name
+			}
+			if runtime == "" {
+				runtime = "unknown"
+			}
+
+			status := "active"
+			if deployment.Status.ReadyReplicas == 0 {
+				status = "inactive"
+			} else if deployment.Status.ReadyReplicas < *deployment.Spec.Replicas {
+				status = "building"
+			}
+
+			lastDeploy := "unknown"
+			if deployment.Status.Conditions != nil && len(deployment.Status.Conditions) > 0 {
+				lastUpdate := deployment.Status.Conditions[len(deployment.Status.Conditions)-1].LastUpdateTime
+				lastDeploy = lastUpdate.Format("2006-01-02 15:04")
+			}
+
+			if existing, exists := applicationMap[appName]; exists {
+				// Add environment to existing app
+				existing.Environments = append(existing.Environments, namespace)
+				// Update status if this environment has issues
+				if status != "active" {
+					existing.Status = status
+				}
+			} else {
+				// Create new application entry
+				applicationMap[appName] = &ProjectResponse{
+					ID:          uint(i + 1),
+					Name:        appName,
+					Description: fmt.Sprintf("%s application running on Kubernetes", strings.Title(runtime)),
+					Repository:  fmt.Sprintf("https://github.com/yourorg/%s.git", appName),
+					Runtime:     runtime,
+					Status:      status,
+					LastDeploy:  lastDeploy,
+					Environments: []string{namespace},
+				}
+			}
+		}
+	}
+
+	// Convert map to slice
+	var projects []ProjectResponse
+	for _, project := range applicationMap {
+		projects = append(projects, *project)
+	}
+
 	c.JSON(http.StatusOK, projects)
 }
 

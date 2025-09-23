@@ -40,11 +40,21 @@ func NewManager(cfg *config.Config, db *gorm.DB) *Manager {
 }
 
 func (m *Manager) Initialize() error {
-	// For development, skip actual service initialization
-	// TODO: Enable when implementing real integrations
-	
 	fmt.Println("Initializing Plate service manager...")
-	fmt.Println("Running in development mode with fake data")
+	
+	// Initialize Kubernetes service
+	if m.Kubernetes != nil {
+		fmt.Println("Initializing Kubernetes service...")
+		if err := m.Kubernetes.Initialize(); err != nil {
+			fmt.Printf("Warning: Failed to initialize Kubernetes service: %v\n", err)
+			fmt.Println("Continuing without Kubernetes integration...")
+		} else {
+			fmt.Println("Kubernetes service initialized successfully")
+		}
+	}
+	
+	// For development, skip other service initializations
+	// TODO: Enable ArgoCD, Helm, and Gitea when implementing real integrations
 	
 	return nil
 }

@@ -86,5 +86,25 @@ func (s *Server) setupRoutes() {
 		
 		// Status
 		v1.GET("/status", s.handleGetStatus)
+
+		// Application management
+		apps := v1.Group("/apps")
+		{
+			apps.GET("/:name/status", s.handleGetAppStatus)
+			apps.POST("/:name/scale", s.handleScaleApp)      // ?env=dev
+			apps.POST("/:name/start", s.handleStartApp)      // ?env=dev
+			apps.POST("/:name/stop", s.handleStopApp)        // ?env=dev  
+			apps.POST("/:name/restart", s.handleRestartApp)  // ?env=dev
+		}
+
+		// Low-level deployment management
+		manage := v1.Group("/manage")
+		{
+			manage.GET("/:namespace/:name/status", s.handleGetDeploymentStatus)
+			manage.POST("/:namespace/:name/scale", s.handleScaleDeployment)
+			manage.POST("/:namespace/:name/start", s.handleStartDeployment)
+			manage.POST("/:namespace/:name/stop", s.handleStopDeployment)
+			manage.POST("/:namespace/:name/restart", s.handleRestartDeployment)
+		}
 	}
 }

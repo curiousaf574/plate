@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  namespace: production
+  labels:
+    app: web-app
+    managed-by: plate
+    runtime: nodejs
+    environment: production
+    version: v1.2.3
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: web-app
+  template:
+    metadata:
+      labels:
+        app: web-app
+        managed-by: plate
+        runtime: nodejs
+        environment: production
+        version: v1.2.3
+    spec:
+      containers:
+      - name: web-app
+        image: nginx:1.21-alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: API_URL
+          value: "http://api-service:3000"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app
+  namespace: production
+  labels:
+    app: web-app
+    managed-by: plate
+spec:
+  selector:
+    app: web-app
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-service
+  namespace: production
+  labels:
+    app: api-service
+    managed-by: plate
+    runtime: go
+    environment: production
+    version: v2.1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-service
+  template:
+    metadata:
+      labels:
+        app: api-service
+        managed-by: plate
+        runtime: go
+        environment: production
+        version: v2.1.0
+    spec:
+      containers:
+      - name: api-service
+        image: httpd:2.4-alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: GO_ENV
+          value: "production"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
