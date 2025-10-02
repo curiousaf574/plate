@@ -1,4 +1,4 @@
-# Plate - The Developer Platform You've Been Waiting For
+# Plate - The Developer Platform I've Always Wanted
 
 > *"After years of building cloud-native platforms and struggling with fragmented tooling, I built the opinionated developer portal I always wished existed."*
 
