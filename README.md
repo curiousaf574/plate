@@ -1,205 +1,268 @@
-# Plate - The Developer Platform I've Always Wanted
+# Plate - Developer Platform# Plate - Developer Platform
 
-> *"After years of building cloud-native platforms and struggling with fragmented tooling, I built the opinionated developer portal I always wished existed."*
 
-## 🤔 The Problem That Started It All
 
-As both a platform engineer and developer, I've lived in both worlds. I've built Kubernetes platforms, designed GitOps workflows, and automated everything. But when it came time to actually *use* these platforms day-to-day as a developer? **The experience was painful.**
+> *"After years of building cloud-native platforms and struggling with fragmented tooling, I built the opinionated developer portal I always wished existed."*> *"After years of building cloud-native platforms and struggling with fragmented tooling, I built the opinionated developer portal I always wished existed."*
 
-**The Reality Check:**
-- 🔧 **Fragmented Tools** - CLI here, web UI there, API somewhere else - nothing worked together
-- 📚 **Cognitive Overload** - Need a PhD in Kubernetes just to deploy a simple app
-- 🎪 **Context Switching** - Jump between 5 different tools to see what's happening
-- 🐌 **Slow Feedback** - Wait 10 minutes to find out your YAML had a typo
-- 😤 **Developer Frustration** - "I just want to deploy my code!"
 
-After months of research and trying every developer platform out there, I realized: **The tool I needed didn't exist.**
 
-## 💡 The Vision: What Developers Actually Want
+## Why Plate?## Why Plate?
 
-**Plate** is the opinionated developer portal born from real-world frustration. It's what happens when someone with deep platform engineering knowledge decides to build the perfect developer experience.
 
-### 🎯 The Core Philosophy
-- **Unified Experience** - One CLI, one UI, one API - everything connected
-- **Zero Kubernetes Knowledge Required** - Deploy without knowing what a Pod is
-- **Instant Feedback** - See what's happening in real-time
-- **Opinionated & Smart** - Make the right choices automatically
-- **Beautiful & Intuitive** - Tools should be a joy to use
 
-## 🚀 What Makes Plate Different?
+As both a platform engineer and developer, I've built Kubernetes platforms and GitOps workflows, but using them day-to-day was painful. Fragmented tools, complex YAML, slow feedback loops - developers shouldn't need a PhD in Kubernetes just to deploy their code.As both a platform engineer and developer, I've built Kubernetes platforms and GitOps workflows, but using them day-to-day was painful. Fragmented tools, complex YAML, slow feedback loops - developers shouldn't need a PhD in Kubernetes just to deploy their code.
 
-Plate transforms the deployment experience by providing:
 
-### 🎪 **The Triple Threat**
+
+After trying every developer platform out there, I realized: **The tool I needed didn't exist.**After trying every developer platform out there, I realized: **The tool I needed didn't exist.**
+
+
+
+## What is Plate?## What is Plate?
+
+
+
+Plate is a unified developer platform that makes Kubernetes deployments simple. One CLI, one UI, one API - everything connected.Plate is a unified developer platform that makes Kubernetes deployments simple. One CLI, one UI, one API - everything connected.
+
+
+
+**Core Philosophy:****Core Philosophy:**
+
+- Deploy without YAML or Kubernetes knowledge- Deploy without YAML or Kubernetes knowledge
+
+- Instant feedback and real-time monitoring  - Instant feedback and real-time monitoring  
+
+- Opinionated choices that just work- Opinionated choices that just work
+
+- Beautiful, intuitive interfaces- Beautiful, intuitive interfaces
+
+
+
+## Components## 🚀 What Makes Plate Different?
+
+
+
+- **CLI** - Command-line tool for importing projects and managing deploymentsPlate transforms the deployment experience by providing:
+
+- **UI** - Web dashboard for visual monitoring and team collaboration  
+
+- **API** - REST service for automation and third-party integrations### 🎪 **The Triple Threat**
+
 Unlike other platforms that force you to choose between CLI, UI, or API - Plate gives you all three, perfectly synchronized:
 
+## Key Features
+
 - **�️ CLI That Doesn't Suck** - `plate deploy` and you're done. No 47-line YAML files.
-- **🎨 Gorgeous Web Dashboard** - Monitor everything in a beautiful, real-time interface
-- **⚡ Rock-Solid API** - Integrate with anything, automate everything
 
-### 🧠 **Smart by Default**
-- **🔍 Auto-Detection Magic** - Knows if you're building Node.js, Python, Go, Rust, Java, PHP, or Ruby
-- **🐳 Dockerfile Generation** - Creates optimized Dockerfiles automatically
-- **🚀 GitOps Without the Complexity** - ArgoCD and Helm under the hood, invisible to you
-- **🌐 Instant URLs** - Every deployment gets a live URL immediately
+- **Auto-Detection** - Identifies Node.js, Python, Go, Rust, Java, PHP, and Ruby projects- **🎨 Gorgeous Web Dashboard** - Monitor everything in a beautiful, real-time interface
 
-### �‍💻 **Developer Happiness Features**
-- **⚡ Sub-30-Second Deployments** - From code to URL faster than your coffee gets cold
-- **📊 Real-Time Everything** - Logs, status, metrics - all live, all the time  
+- **GitOps Workflow** - Uses ArgoCD and Helm for reliable deployments- **⚡ Rock-Solid API** - Integrate with anything, automate everything
+
+- **Multi-Environment** - Easy management of dev, staging, and production
+
+- **Real-Time Monitoring** - Live deployment status, logs, and metrics### 🧠 **Intelligent Automation**
+
+- **Team Collaboration** - RBAC, audit trails, and shared management- **🔍 Runtime Detection** - Automatically identifies Node.js, Python, Go, Rust, Java, PHP, and Ruby projects
+
+- **🐳 Dockerfile Generation** - Creates optimized Dockerfiles when needed
+
+## Quick Start- **🚀 GitOps Integration** - Uses ArgoCD and Helm behind the scenes for reliable deployments
+
+- **🌐 Automatic URLs** - Generates accessible URLs for each deployment
+
+```bash
+
+# Install from source### �‍💻 **Developer Happiness Features**
+
+git clone https://github.com/curiousaf574/plate- **⚡ Sub-30-Second Deployments** - From code to URL faster than your coffee gets cold
+
+cd plate/cli && go build -o plate .- **📊 Real-Time Everything** - Logs, status, metrics - all live, all the time  
+
 - **🔄 Environment Juggling Made Easy** - Switch between dev, staging, prod with zero friction
-- **🎯 Zero YAML Required** - Seriously. We handle all the Kubernetes complexity
-- **💥 Failure Recovery** - Automatic rollbacks when things go wrong
 
-### 🏢 **Enterprise-Ready, Startup-Friendly**
-- **🔒 Security First** - RBAC, network policies, and secrets management built-in
-- **📈 Scales with You** - Handle 1 app or 1000 apps with the same elegance
+# Import your project- **🎯 Zero YAML Required** - Seriously. We handle all the Kubernetes complexity
+
+plate import- **💥 Failure Recovery** - Automatic rollbacks when things go wrong
+
+
+
+# Deploy to development### 🏢 **Enterprise-Ready, Startup-Friendly**
+
+plate deploy- **🔒 Security First** - RBAC, network policies, and secrets management built-in
+
+```- **📈 Scales with You** - Handle 1 app or 1000 apps with the same elegance
+
 - **👥 Team Collaboration** - Share deployments, manage permissions, audit everything
-- **🔔 Smart Notifications** - Get pinged when things matter, not for every log line
 
-## 🚀 See It In Action (30 Second Demo)
+## Supported Runtimes- **🔔 Smart Notifications** - Get pinged when things matter, not for every log line
 
-**The "Holy Shit, It Actually Works" Moment:**
 
-```bash
-# Step 1: Navigate to your project (any project!)
-cd my-messy-node-app
 
-# Step 2: Let Plate work its magic
-plate import
-# ✨ Detects Node.js, generates Dockerfile, creates config
+Plate automatically detects and configures:## Quick Start
 
-# Step 3: Deploy to the cloud
+
+
+- **Node.js** - `package.json` → `npm install` → `npm start````bash
+
+- **Python** - `requirements.txt` → `pip install` → `python app.py`# Install from source
+
+- **Go** - `go.mod` → `go build` → `./app`git clone https://github.com/curiousaf574/plate
+
+- **Java** - `pom.xml` → `mvn package` → `java -jar app.jar`cd plate/cli && go build -o plate .
+
+- **PHP** - `composer.json` → `composer install` → `php -S 0.0.0.0:8000`
+
+- **Ruby** - `Gemfile` → `bundle install` → `bundle exec ruby app.rb`# Import your project
+
+- **Rust** - `Cargo.toml` → `cargo build --release` → `./target/release/app`plate import
+
+
+
+## Architecture# Deploy to development
+
 plate deploy
-# 🚀 Building... Deploying... Done!
-# 🌐 Live at: https://my-messy-node-app-dev.yourcluster.com
 
-# Step 4: Bask in glory
-echo "I just deployed to Kubernetes without writing a single line of YAML 🥳"
+Plate consists of three main components:```
+
+
+
 ```
 
-**What just happened?**
-- Plate detected your Node.js app
-- Generated an optimized Dockerfile  
-- Created Kubernetes manifests
-- Set up GitOps with ArgoCD
-- Deployed via Helm
-- Gave you a live URL
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
 
-**Time elapsed:** ~25 seconds ⏱️
+│   Plate CLI     │    │  Web Dashboard  │    │   API Service   │## Supported Runtimes
 
-### 🎮 Try It Yourself
+│                 │    │                 │    │                 │
 
-```bash
-# Install Plate CLI
-curl -sSL https://plate.dev/install.sh | bash
+│ • plate import  │───▶│ • Applications  │───▶│ • Deployments   │Plate automatically detects and configures:
 
-# Or build from source
-git clone https://github.com/bramha574/plate
-cd plate/cli && go build -o plate .
-```
+│ • plate deploy  │    │ • Deployments   │    │ • Environments  │
 
-## 🎨 The Dashboard That Doesn't Make You Cry
+│ • plate status  │    │ • Monitoring    │    │ • Build System  │- **Node.js** - `package.json` → `npm install` → `npm start`
 
-**Finally, a Kubernetes UI that's actually beautiful:**
+└─────────────────┘    └─────────────────┘    └─────────────────┘- **Python** - `requirements.txt` → `pip install` → `python app.py`
 
-![Plate Dashboard Preview](https://via.placeholder.com/800x400/6366f1/white?text=Beautiful+Dashboard+Preview)
+```- **Go** - `go.mod` → `go build` → `./app`
 
-- **🎯 At-a-Glance Overview** - All your apps, all environments, one screen
-- **📊 Real-Time Metrics** - CPU, memory, requests - updating live
-- **📝 Deployment History** - Every deployment, every rollback, fully auditable  
-- **🔍 Powerful Search** - Find any app, any deployment, instantly
-- **🌙 Dark Mode** - Because platform engineers work at night
-- **📱 Mobile Ready** - Check deployments from your phone (yes, really!)
+- **Java** - `pom.xml` → `mvn package` → `java -jar app.jar`
 
-**The best part?** It's not just pretty - it's actually functional. Click deploy, watch it happen in real-time. No more guessing if your deployment worked.
+**Infrastructure:** Built on Kubernetes, ArgoCD (GitOps), Helm (packaging), and Gitea (Git hosting).- **PHP** - `composer.json` → `composer install` → `php -S 0.0.0.0:8000`
 
-## 🎯 Runtime Support That Actually Works
+- **Ruby** - `Gemfile` → `bundle install` → `bundle exec ruby app.rb`
 
-**Plate speaks your language (literally):**
+## Documentation- **Rust** - `Cargo.toml` → `cargo build --release` → `./target/release/app`
 
-| 🚀 Runtime | 🔍 Detection | ⚡ Auto-Generated | 🎉 Just Works |
-|-----------|-------------|------------------|---------------|
-| **Node.js** | `package.json` → `npm install` → `npm start` | ✅ Dockerfile + Build optimization |
-| **Python** | `requirements.txt` → `pip install` → Smart start detection | ✅ Virtual env handling |
-| **Go** | `go.mod` → `go build` → Binary execution | ✅ Multi-stage Docker builds |
-| **Rust** | `Cargo.toml` → `cargo build --release` → Optimized binary | ✅ Lightning-fast containers |
-| **Java** | `pom.xml` → `mvn package` → JAR execution | ✅ JVM optimization |
-| **PHP** | `composer.json` → `composer install` → Built-in server | ✅ Modern PHP stack |
-| **Ruby** | `Gemfile` → `bundle install` → Smart execution | ✅ Rails-ready |
 
-**The Magic:** Plate doesn't just detect your runtime - it optimizes everything:
-- 🐳 **Smart Dockerfiles** - Multi-stage builds, layer caching, security hardening
-- ⚡ **Build Optimization** - Dependency caching, parallel builds
-- 🔒 **Security First** - Non-root users, minimal base images, vulnerability scanning
-- 📦 **Production Ready** - Health checks, graceful shutdown, resource limits
 
-## � Real-World Impact Stories
+📖 **[Complete Documentation](docs/)** - Everything you need to know## � Real-World Impact Stories
 
-### 😎 **Solo Developers**
-*"I went from Kubernetes-phobic to deploying 5 side projects a week"*
-- **Weekend Warriors** - Deploy that hackathon project before Monday
-- **Portfolio Power** - Live demos that actually work during interviews
+
+
+- **[Getting Started](docs/getting-started/)** - Your first deployment in 5 minutes### 😎 **Solo Developers**
+
+- **[API Reference](docs/api/)** - Complete REST API documentation*"I went from Kubernetes-phobic to deploying 5 side projects a week"*
+
+- **[Architecture](docs/architecture/)** - System design and component interactions- **Weekend Warriors** - Deploy that hackathon project before Monday
+
+- **[Deployment Guide](docs/deployment/)** - Production deployment instructions- **Portfolio Power** - Live demos that actually work during interviews
+
 - **Learning Labs** - Try new frameworks without infrastructure nightmares
-- **API Playground** - Rapid prototyping with instant feedback
 
-### 🚀 **Development Teams**  
-*"Our PR review process went from 2 days to 2 hours"*
-- **Branch Deployments** - Every feature gets a live URL for review
-- **Demo Magic** - Show clients progress with real, working deployments
+## Development- **API Playground** - Rapid prototyping with instant feedback
+
+
+
+```bash### 🚀 **Development Teams**  
+
+# Clone the repository*"Our PR review process went from 2 days to 2 hours"*
+
+git clone https://github.com/curiousaf574/plate- **Branch Deployments** - Every feature gets a live URL for review
+
+cd plate- **Demo Magic** - Show clients progress with real, working deployments
+
 - **Staging Sanity** - Testing environments that mirror production exactly
-- **Microservice Mastery** - Manage 20 services as easily as 1
 
-### 🏢 **Platform Teams**
-*"We finally have a developer portal that developers actually want to use"*
+# Start the services (3 terminals):- **Microservice Mastery** - Manage 20 services as easily as 1
+
+
+
+# Terminal 1: API Service### 🏢 **Platform Teams**
+
+cd service && go run main.go serve*"We finally have a developer portal that developers actually want to use"*
+
 - **Developer Velocity** - 10x faster from idea to production
-- **Reduced Support Tickets** - Self-service that actually works
-- **Compliance Made Easy** - Security and governance built-in
+
+# Terminal 2: Web Dashboard  - **Reduced Support Tickets** - Self-service that actually works
+
+cd ui && npm install && npm run dev- **Compliance Made Easy** - Security and governance built-in
+
 - **Migration Path** - Move legacy apps to cloud-native without drama
 
-### 🎯 **The Sweet Spot**
-**Plate shines when you need:**
+# Terminal 3: CLI
+
+cd cli && go build -o plate .### 🎯 **The Sweet Spot**
+
+```**Plate shines when you need:**
+
 - Kubernetes power without Kubernetes complexity
-- Multiple environments managed effortlessly  
+
+**Prerequisites:** Go 1.21+, Node.js 18+, Docker Desktop, kubectl- Multiple environments managed effortlessly  
+
 - Real-time visibility into everything
-- A single tool that does it all well
 
-## 📚 Documentation
+## Contributing- A single tool that does it all well
 
-- [**Getting Started**](docs/getting-started/README.md) - Complete setup guide
-- [**CLI Reference**](docs/cli/README.md) - All CLI commands and options
-- [**Web Dashboard**](docs/dashboard/README.md) - Using the web interface
-- [**Deployment Guide**](docs/deployment/README.md) - Production deployment
-- [**API Documentation**](docs/api/README.md) - REST API reference
 
-## 🏗️ Architecture: The Platform Engineer's Dream
 
-**Built by someone who's been in the trenches of platform engineering:**
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.## Documentation
 
+
+
+## License� **[Complete Documentation](docs/)** - Everything you need to know
+
+
+
+Plate is open source software licensed under the [MIT License](LICENSE).- **[Getting Started](docs/getting-started/)** - Your first deployment in 5 minutes
+
+- **[API Reference](docs/api/)** - Complete REST API documentation
+
+---- **[Architecture](docs/architecture/)** - System design and component interactions
+
+- **[Deployment Guide](docs/deployment/)** - Production deployment instructions
+
+**Ready to deploy?** Start with `plate import` in your project directory! 🚀
+## Development
+
+```bash
+# Clone the repository
+git clone https://github.com/curiousaf574/plate
+cd plate
+
+# Start the services (3 terminals):
+
+# Terminal 1: API Service
+cd service && go run main.go serve
+
+# Terminal 2: Web Dashboard  
+cd ui && npm install && npm run dev
+
+# Terminal 3: CLI
+cd cli && go build -o plate .
 ```
-    Developer Experience Layer
-┌─────────────────────────────────────────────────────────────┐
-│  🖥️ CLI Tool        🎨 Web Dashboard       ⚡ REST API       │
-│  • plate import    • Real-time UI         • Full automation │
-│  • plate deploy    • Visual monitoring    • Webhook support │
-│  • plate status    • Team collaboration   • 3rd party tools │
-└─────────────────────────────────────────────────────────────┘
-                            │
-    Orchestration & GitOps Layer  
-┌─────────────────────────────────────────────────────────────┐
-│  🔄 ArgoCD           📦 Helm Charts        🐙 Gitea         │
-│  • GitOps workflows • Templating          • Git hosting    │
-│  • Auto-sync        • Release management  • Webhooks       │
-│  • Rollback support • Environment configs • Branch deploy  │
-└─────────────────────────────────────────────────────────────┘
-                            │
-    Infrastructure Layer
-┌─────────────────────────────────────────────────────────────┐
-│  ☸️ Kubernetes       🗄️ PostgreSQL        🔒 Security       │
-│  • Container runtime • State management   • RBAC           │
-│  • Service mesh     • Deployment history  • Network policy │
-│  • Auto-scaling     • Audit logs         • Secrets mgmt   │
-└─────────────────────────────────────────────────────────────┘
-```
+
+**Prerequisites:** Go 1.21+, Node.js 18+, Docker Desktop, kubectl
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+## License
+
+Plate is open source software licensed under the [MIT License](LICENSE).
+
+---
+
+**Ready to deploy?** Start with `plate import` in your project directory! 🚀
 
 ### 🎯 **Why This Architecture Works**
 - **🔄 GitOps Native** - Every deployment is version controlled and auditable
