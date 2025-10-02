@@ -2,6 +2,9 @@
 
 Vue.js frontend application for the Plate platform.
 
+![Plate Dashboard](../screenshots/main-page.png)
+*Beautiful, responsive dashboard built with Vue 3 and Tailwind CSS*
+
 ## Setup
 
 ```bash

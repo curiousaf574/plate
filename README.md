@@ -2,6 +2,31 @@
 
 > *"After years of building cloud-native platforms and struggling with fragmented tooling, I built the opinionated developer portal I always wished existed."*
 
+## ⚠️ Development Status
+
+**🚧 This project is currently in active development and not yet fully functional. 🚧**
+
+Plate is an ambitious project to revolutionize developer deployment workflows. While the vision and architecture are solid, many features are still being implemented. 
+
+**Current Status:**
+- ✅ Core architecture and components designed
+- ✅ Basic CLI structure implemented
+- ✅ Vue.js dashboard UI framework ready
+- ✅ API endpoints defined
+- 🔄 Integration with Kubernetes, ArgoCD, and Gitea in progress
+- 🔄 End-to-end deployment workflows being built
+- ❌ Full deployment automation not yet complete
+
+**What This Means:**
+- The project showcases the planned architecture and user experience
+- Some commands and features may not work as expected
+- This is perfect for exploring the vision and contributing to development
+- Production use is not recommended at this time
+
+**Want to Contribute?** This is an excellent time to get involved! Check out the [development setup](#-join-the-revolution-development-setup) below.
+
+---
+
 ## Why Plate?
 
 As both a platform engineer and developer, I've built Kubernetes platforms and GitOps workflows, but using them day-to-day was painful. Fragmented tools, complex YAML, slow feedback loops - developers shouldn't need a PhD in Kubernetes just to deploy their code.
@@ -18,7 +43,12 @@ Plate is a unified developer platform that makes Kubernetes deployments simple. 
 - Opinionated choices that just work
 - Beautiful, intuitive interfaces
 
-## 🚀 What Makes Plate Different?
+## � See It In Action
+
+![Plate Dashboard](screenshots/main-page.png)
+*The Plate dashboard provides a beautiful, real-time view of all your deployments and system health*
+
+## �🚀 What Makes Plate Different?
 
 Plate transforms the deployment experience by providing:
 

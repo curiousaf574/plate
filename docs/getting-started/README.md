@@ -177,6 +177,9 @@ plate status --env production
 
 Visit http://localhost:3000 to access the web dashboard:
 
+![Plate Dashboard](../../screenshots/main-page.png)
+*The main dashboard showing application overview, deployments, and system health*
+
 ### Applications Page
 - View all imported applications
 - See deployment status across environments
